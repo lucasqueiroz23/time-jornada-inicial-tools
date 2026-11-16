@@ -1,7 +1,7 @@
 ---
 name: refinar-tarefa
 description: Refina uma tarefa do Jira que está com pouca informação. Lê a tarefa, diz o que entendeu, tira as dúvidas com quem pediu e reescreve a descrição com resumo, o que precisa ser feito, como deve funcionar e critérios de aceite. Depois do aceite, grava no Jira e move a tarefa para Refinado. Use quando alguém pedir para refinar, detalhar ou enriquecer uma tarefa do Jira.
-argument-hint: "[chave-da-tarefa]"
+argument-hint: "[chave ou link da tarefa]"
 ---
 
 # Refinar tarefa
@@ -18,7 +18,7 @@ A conversa é sobre produto e regra de negócio. Não investigue código e não 
 
 ### 1. Busque a tarefa no Jira
 
-A tarefa sempre vem do Jira. Se a pessoa não informou a chave (como `ABC-123`), peça.
+A tarefa sempre vem do Jira. A pessoa pode informar a chave (como `ABC-123`) ou colar o link da tarefa; no caso do link, tire a chave dele. Se não veio nenhum dos dois, peça.
 
 Leia o título, a descrição, os comentários, a tarefa pai ou o épico e as tarefas ligadas. Os comentários costumam ter decisões que não foram para a descrição.
 
