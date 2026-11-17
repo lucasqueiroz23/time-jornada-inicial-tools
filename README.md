@@ -23,12 +23,9 @@ Os arquivos ficam em `.claude/`, no mesmo formato que o Claude Code lê. Assim, 
     └── skills/
         ├── descricao-de-pr/
         │   └── SKILL.md
-        └── refinar-tarefa/
-        ├── descricao-de-pr/
+        ├── gerar-prd/
         │   └── SKILL.md
-        └── gerar-prd/
-            └── SKILL.md
-        ├── descricao-de-pr/
+        ├── refinar-tarefa/
         │   └── SKILL.md
         └── setup/
             ├── SKILL.md
