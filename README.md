@@ -28,6 +28,11 @@ Os arquivos ficam em `.claude/`, no mesmo formato que o Claude Code lê. Assim, 
         │   └── SKILL.md
         └── gerar-prd/
             └── SKILL.md
+        ├── descricao-de-pr/
+        │   └── SKILL.md
+        └── setup/
+            ├── SKILL.md
+            └── checar.sh
 ```
 
 - Cada agent é um arquivo `.md` em `.claude/agents/`.
@@ -42,10 +47,24 @@ Os arquivos ficam em `.claude/`, no mesmo formato que o Claude Code lê. Assim, 
 | [revisor-de-codigo](.claude/agents/revisor-de-codigo.md) | Agent | Revisa as alterações locais ou de uma branch em busca de bugs, riscos e pontos de melhoria. |
 | [descricao-de-pr](.claude/skills/descricao-de-pr/SKILL.md) | Skill | Escreve a descrição de um pull request a partir das alterações da branch atual. |
 | [gerar-prd](.claude/skills/gerar-prd/SKILL.md) | Skill | Gera o PRD de uma tarefa do Jira já refinada: avalia se a tarefa precisa de PRD, tira as dúvidas, escreve o documento e, depois do aceite, grava como comentário na tarefa e move para "PRD em revisão". Precisa do MCP do Jira configurado. Uso: `/gerar-prd ABC-123` ou `/gerar-prd <link da tarefa>`. |
+| [setup](.claude/skills/setup/SKILL.md) | Skill | Prepara a máquina: copia os agents e as skills para a pasta pessoal do Claude Code e configura o MCP do Jira. Só funciona dentro deste repositório. |
 
 O `revisor-de-codigo` e a `descricao-de-pr` servem de exemplo para quem for criar os próximos.
 
 ## Como usar
+
+### Setup
+
+Abra o Claude Code na raiz do repositório e rode `/setup`. A skill verifica o que falta na sua máquina, mostra o que vai fazer e, depois do seu aceite:
+
+- copia os agents e as skills para `~/.claude`, para valerem em todos os seus projetos;
+- configura o MCP oficial da Atlassian, se você ainda não tiver nenhum MCP de Jira. Skills que leem ou gravam no Jira dependem dele.
+
+O login no Jira é feito por você no navegador, com a sua conta Atlassian. O setup não pede token nem senha.
+
+Rode `/setup` de novo depois de um `git pull` para atualizar as cópias. Se você alterou alguma delas, a skill mostra a diferença e pergunta antes de substituir.
+
+O que o setup não faz: instalar o Claude Code. Sem ele, siga antes a [documentação de instalação](https://code.claude.com/docs/pt/setup).
 
 ### Neste repositório
 
@@ -53,7 +72,7 @@ Abra o Claude Code na raiz do repositório. Os agents aparecem em `/agents` e as
 
 ### Em todos os seus projetos
 
-Copie o que precisar para a sua pasta pessoal do Claude Code:
+O `/setup` faz isso por você. Para copiar à mão só o que precisar para a sua pasta pessoal do Claude Code:
 
 ```bash
 mkdir -p ~/.claude/agents ~/.claude/skills
