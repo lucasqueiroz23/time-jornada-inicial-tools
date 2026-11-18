@@ -40,10 +40,10 @@ Os arquivos ficam em `.claude/`, no mesmo formato que o Claude Code lê. Assim, 
 
 | Nome | Tipo | O que faz |
 | --- | --- | --- |
-| [refinar-tarefa](.claude/skills/refinar-tarefa/SKILL.md) | Skill | Refina uma tarefa do Jira com pouca informação: diz o que entendeu, tira as dúvidas com quem pediu, reescreve a descrição e, depois do aceite, grava no Jira e move a tarefa para "Refinado". Feita para produto e projetos. Precisa do MCP do Jira configurado. Uso: `/refinar-tarefa ABC-123` ou `/refinar-tarefa <link da tarefa>`. |
+| [refinar-tarefa](.claude/skills/refinar-tarefa/SKILL.md) | Skill | Refina uma tarefa do Jira com pouca informação, de qualquer tipo (funcionalidade, bug, técnica, segurança ou investigação): diz o que entendeu, tira as dúvidas com quem pediu, reescreve a descrição e, depois do aceite, grava no Jira e move a tarefa para "Refinado". Precisa do MCP do Jira configurado. Uso: `/refinar-tarefa ABC-123` ou `/refinar-tarefa <link da tarefa>`. |
 | [revisor-de-codigo](.claude/agents/revisor-de-codigo.md) | Agent | Revisa as alterações locais ou de uma branch em busca de bugs, riscos e pontos de melhoria. |
 | [descricao-de-pr](.claude/skills/descricao-de-pr/SKILL.md) | Skill | Escreve a descrição de um pull request a partir das alterações da branch atual. |
-| [gerar-prd](.claude/skills/gerar-prd/SKILL.md) | Skill | Gera o PRD de uma tarefa do Jira já refinada: avalia se a tarefa precisa de PRD, tira as dúvidas, escreve o documento e, depois do aceite, grava como comentário na tarefa e move para "PRD em revisão". Precisa do MCP do Jira configurado. Uso: `/gerar-prd ABC-123` ou `/gerar-prd <link da tarefa>`. |
+| [gerar-prd](.claude/skills/gerar-prd/SKILL.md) | Skill | Gera o PRD de uma tarefa do Jira já refinada, de qualquer tipo: ajusta o tamanho do documento ao tipo da tarefa, tira as dúvidas, escreve o documento e, depois do aceite, grava como comentário na tarefa e move para "PRD em revisão". Precisa do MCP do Jira configurado. Uso: `/gerar-prd ABC-123` ou `/gerar-prd <link da tarefa>`. |
 | [setup](.claude/skills/setup/SKILL.md) | Skill | Prepara a máquina: copia os agents e as skills para a pasta pessoal do Claude Code e configura o MCP do Jira. Só funciona dentro deste repositório. |
 
 O `revisor-de-codigo` e a `descricao-de-pr` servem de exemplo para quem for criar os próximos.

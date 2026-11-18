@@ -1,6 +1,6 @@
 ---
 name: gerar-prd
-description: Gera o PRD de uma tarefa do Jira que já foi refinada. Lê a tarefa, avalia se ela precisa de PRD, tira as dúvidas com quem pediu, escreve o documento e, depois do aceite, grava como comentário na tarefa e move para "PRD em revisão". Use quando alguém pedir para gerar, escrever ou atualizar o PRD de uma tarefa do Jira.
+description: Gera o PRD de uma tarefa do Jira que já foi refinada, de qualquer tipo (funcionalidade, bug, tarefa técnica, segurança ou investigação). Lê a tarefa, ajusta o tamanho do documento ao tipo dela, tira as dúvidas com quem pediu, escreve o PRD e, depois do aceite, grava como comentário na tarefa e move para "PRD em revisão". Use quando alguém pedir para gerar, escrever ou atualizar o PRD de uma tarefa do Jira.
 argument-hint: "[chave ou link da tarefa]"
 ---
 
@@ -22,17 +22,20 @@ Leia o título, a descrição, o status, os comentários, a tarefa pai ou o épi
 
 Se a sessão não tiver ferramentas do Jira, avise que é preciso configurar o MCP do Jira (Atlassian) e pare.
 
-### 2. Avalie se a tarefa precisa de PRD
+### 2. Identifique o tipo da tarefa
 
-Nem toda tarefa precisa. Faça esta avaliação antes de qualquer outra, para não pedir refinamento de uma tarefa que nem vai ter PRD.
+Toda tarefa do time passa pelo PRD, seja qual for o tipo. Nunca recuse uma tarefa por ser pequena, técnica, de bug ou de segurança. O tipo define o tamanho do documento e o que cada seção responde:
 
-| Situação | Recomendação |
+| Tipo de tarefa | Como fica o PRD |
 | --- | --- |
-| Funcionalidade nova, mudança de regra de negócio ou de comportamento que alguém de fora do time percebe | PRD. |
-| Correção de bug ou ajuste em que a descrição já diz tudo o que há para dizer | Sem PRD. A descrição refinada basta. |
-| Investigação ou trabalho técnico sem mudança de comportamento, como reduzir conexões, migrar versão ou melhorar desempenho | Sem PRD. O que essa tarefa pede é uma especificação técnica, que vem na etapa seguinte. |
+| Funcionalidade nova, mudança de regra de negócio ou de comportamento que alguém de fora do time percebe | PRD completo. |
+| Correção de bug ou ajuste pequeno | PRD curto. "Problema" traz o comportamento de hoje e o esperado. Os requisitos descrevem o comportamento corrigido e o que não pode mudar junto. |
+| Tarefa técnica ou de segurança, como fechar uma rota sem permissão, reduzir conexões, migrar versão ou melhorar desempenho | PRD curto. "Problema" traz o risco ou o custo de hoje e onde ele está. Os requisitos são os resultados que precisam ser verdade depois da entrega, como "quem não é dono da loja recebe recusa". Em "Quem é afetado" entram também os sistemas e as integrações que chamam o que vai mudar. |
+| Investigação | PRD curto. "Objetivo" é a pergunta a responder. Os requisitos dizem o que a resposta precisa conter e que decisão ela destrava. |
 
-Se a recomendação for não gerar, diga isso em uma frase com o motivo e pare, sem gravar nada no Jira. A recomendação é sua, mas a decisão é de quem pediu: se a pessoa disser que quer o PRD mesmo assim, siga.
+Diga em uma frase qual tipo você identificou e que o PRD vai ser completo ou curto. Se a pessoa discordar, vale o que ela disser.
+
+Em tarefa pequena, várias seções ficam com uma ou duas linhas, e o PRD inteiro cabe em meia página. O documento curto ainda vale a revisão: é nela que o time confere o escopo e os critérios antes do código.
 
 ### 3. Confira o status e os PRDs anteriores
 
@@ -105,9 +108,9 @@ Deixe de fora a seção que ficar vazia, menos "Fora de escopo": se não houver 
 ## Regras de escrita
 
 - **Nada inventado.** Toda informação vem da tarefa, dos comentários, do código lido ou das respostas de quem pediu. Dedução sua só entra depois de confirmada na conversa.
-- **Sem solução técnica.** Nada de nome de tabela, endpoint, biblioteca ou padrão de arquitetura, a não ser que seja uma restrição que já veio da tarefa. Nesse caso, registre em "Riscos, dependências e restrições".
+- **Sem solução técnica.** Nada de nome de tabela, endpoint, biblioteca ou padrão de arquitetura como proposta de implementação. Duas exceções: a restrição que já veio da tarefa, que vai em "Riscos, dependências e restrições", e a tela, rota ou serviço onde o problema acontece hoje, que entra em "Problema" como localização.
 - **Requisitos verificáveis.** "O sistema deve ser rápido" não serve. "A listagem carrega em até 2 segundos com 1.000 registros" serve, desde que o número tenha vindo de quem pediu.
 - **Tamanho proporcional.** O PRD precisa caber em uma leitura de poucos minutos. Se passar de umas duas páginas, a tarefa provavelmente junta entregas que deveriam ser separadas: diga isso e sugira a quebra.
-- **Sem dado sensível.** O comentário fica visível para quem acessa a tarefa. Não coloque dados de clientes, credenciais nem valores reais de transações; use exemplos fictícios.
+- **Sem dado sensível.** O comentário fica visível para quem acessa a tarefa. Não coloque dados de clientes, credenciais nem valores reais de transações; use exemplos fictícios. Em tarefa de segurança, descreva o que precisa passar a ser barrado e deixe de fora o passo a passo de como explorar a falha.
 - **Sem enchimento.** Não escreva introdução, conclusão, lista de benefícios nem frase que só repete o título. Não use emojis.
 - **Português**, com frases completas e os termos que o time já usa na tarefa.
