@@ -53,7 +53,7 @@ Nos outros casos, só siga depois que a pessoa aceitar. O setup grava fora do re
 
 - **Faltando:** copie. Agents vão para `agents/` da pasta pessoal e cada pasta de skill vai inteira para `skills/`. Crie as pastas se não existirem.
 - **Igual:** não faça nada.
-- **Diferente:** mostre o que muda com `diff -ru -x .DS_Store <pasta pessoal> <repositório>` e explique que as linhas com `-` são as da cópia da pessoa e as com `+` são as do repositório. Pergunte, item por item, se pode substituir. A diferença pode ser uma versão antiga, mas também pode ser um ajuste que a pessoa fez de propósito, e substituir apaga esse ajuste.
+- **Diferente:** mostre o que muda com `diff -ru -x .DS_Store -x .skill-meta.json <pasta pessoal> <repositório>` e explique que as linhas com `-` são as da cópia da pessoa e as com `+` são as do repositório. Pergunte, item por item, se pode substituir. A diferença pode ser uma versão antiga, mas também pode ser um ajuste que a pessoa fez de propósito, e substituir apaga esse ajuste.
 
 Para substituir uma skill, copie por cima com `cp -R <repositório>/. <pasta pessoal>/`. Não apague a pasta antes: ela pode ter arquivos que a pessoa criou e que não existem no repositório.
 

@@ -16,7 +16,7 @@ destino="${CLAUDE_CONFIG_DIR:-$HOME/.claude}"
 estado() {
   if [ ! -e "$2" ]; then
     echo faltando
-  elif diff -rq -x .DS_Store "$1" "$2" >/dev/null 2>&1; then
+  elif diff -rq -x .DS_Store -x .skill-meta.json "$1" "$2" >/dev/null 2>&1; then
     echo igual
   else
     echo diferente
