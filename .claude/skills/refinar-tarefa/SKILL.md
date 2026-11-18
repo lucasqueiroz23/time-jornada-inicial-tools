@@ -1,6 +1,6 @@
 ---
 name: refinar-tarefa
-description: Refina uma tarefa do Jira que está com pouca informação. Lê a tarefa, diz o que entendeu, tira as dúvidas com quem pediu e reescreve a descrição com resumo, o que precisa ser feito, como deve funcionar e critérios de aceite. Depois do aceite, grava no Jira e move a tarefa para Refinado. Use quando alguém pedir para refinar, detalhar ou enriquecer uma tarefa do Jira.
+description: Refina uma tarefa do Jira que está com pouca informação, de qualquer tipo (funcionalidade, bug, tarefa técnica, segurança ou investigação). Lê a tarefa, diz o que entendeu, tira as dúvidas com quem pediu e reescreve a descrição com resumo, o que precisa ser feito, como deve funcionar e critérios de aceite. Depois do aceite, grava no Jira e move a tarefa para Refinado. Use quando alguém pedir para refinar, detalhar ou enriquecer uma tarefa do Jira.
 argument-hint: "[chave ou link da tarefa]"
 ---
 
@@ -8,11 +8,20 @@ argument-hint: "[chave ou link da tarefa]"
 
 Tarefa a refinar: $ARGUMENTS
 
-Quem usa esta skill é o pessoal de produto e de projetos do time Jornada Inicial. As tarefas costumam nascer no Jira com um título e uma ou duas frases, e quem desenvolve parte desse texto para escrever a especificação e o código, muitas vezes com ajuda de IA. Uma tarefa vaga vira entrega errada ou retrabalho.
+Quem usa esta skill é quem conhece a demanda no time Jornada Inicial: produto, projetos ou quem desenvolve. As tarefas costumam nascer no Jira com um título e uma ou duas frases, e quem desenvolve parte desse texto para escrever a especificação e o código, muitas vezes com ajuda de IA. Uma tarefa vaga vira entrega errada ou retrabalho.
 
 O seu papel é conversar com quem conhece a demanda até a descrição dizer o que precisa ser feito, como deve funcionar e como saber que terminou, e então gravar essa descrição no Jira e mover a tarefa para "Refinado".
 
-A conversa é sobre produto e regra de negócio. Não investigue código e não proponha solução técnica: isso fica para a etapa seguinte, com quem desenvolve.
+Toda tarefa do time passa por aqui, seja qual for o tipo. Nunca recuse uma tarefa por ser técnica, de bug ou de segurança. O que muda de um tipo para outro é o que a descrição precisa dizer:
+
+| Tipo de tarefa | O que a descrição precisa dizer |
+| --- | --- |
+| Funcionalidade nova ou mudança de regra de negócio | Quem usa, em que situação e o que passa a acontecer. |
+| Bug | O que acontece hoje, o que deveria acontecer, como reproduzir e quem é afetado. |
+| Tarefa técnica ou de segurança | O problema ou o risco de hoje, onde ele está (tela, rota, serviço ou rotina, do jeito que a tarefa ou a pessoa informou) e o resultado que precisa ser verdade depois da entrega. |
+| Investigação | A pergunta a responder, o que já se sabe e o que conta como resposta. |
+
+A conversa é sobre o que precisa mudar e como saber que mudou. Não investigue código e não proponha solução técnica: isso fica para a etapa seguinte, com quem desenvolve. Referência a tela, rota ou arquivo que veio da tarefa ou de quem está refinando entra na descrição como localização do problema, e não como desenho da solução.
 
 ## Passo a passo
 
@@ -40,7 +49,7 @@ Liste as perguntas de uma vez, numeradas e curtas.
 
 Espere as respostas. Se elas abrirem dúvidas novas, pergunte de novo.
 
-Toda pergunta que impede o desenvolvimento precisa ser resolvida antes de a tarefa ser considerada pronta. Se a pessoa não souber responder, diga que a tarefa ainda não está pronta e o que falta descobrir. Se ela quiser gravar mesmo assim, inclua as perguntas na seção "Pendências" da descrição.
+Toda pergunta que impede o desenvolvimento precisa ser resolvida antes de a tarefa ser considerada pronta. Se a pessoa não souber responder, diga que a tarefa ainda não está pronta e o que falta descobrir. Se ela quiser gravar mesmo assim, inclua as perguntas na seção "Pendências" da descrição e pergunte quem pode respondê-las, para o nome ir junto. Isso vale também quando a pessoa não sabe nenhuma resposta: a tarefa fica gravada com o que já se sabe e com as perguntas para quem for pegá-la.
 
 ### 4. Mostre como a descrição ficou
 
@@ -64,12 +73,12 @@ O título é o que a tarefa já tem no Jira. Ele não muda e não se repete dent
 
 | Seção | Conteúdo |
 | --- | --- |
-| **Resumo** | De uma a três frases: o que muda e por quê. |
+| **Resumo** | De uma a três frases: o que muda, por quê e de onde veio o pedido (quem pediu, qual relatório, incidente ou chamado). Se a tarefa não diz a origem, pergunte no passo 3. |
 | **O que precisa ser feito** | Texto corrido descrevendo a entrega. |
 | **Como deve funcionar** | O comportamento esperado do ponto de vista de quem usa, incluindo os casos de erro que a pessoa definiu. Entra só quando acrescenta algo à seção anterior. |
 | **Critérios de aceite** | Lista de afirmações que uma pessoa ou um teste consegue verificar como verdadeiras ou falsas. |
 | **Sugestão de quebra** | Só quando a tarefa junta entregas que podem sair separadas: a lista das tarefas menores. |
-| **Pendências** | Só quando a pessoa decidiu gravar com perguntas sem resposta. |
+| **Pendências** | Só quando a pessoa decidiu gravar com perguntas sem resposta. Lista numerada das perguntas e quem pode responder. |
 
 Deixe de fora a seção que ficar vazia.
 
@@ -78,5 +87,6 @@ Deixe de fora a seção que ficar vazia.
 - **Nada inventado.** Toda informação da descrição vem da tarefa, dos comentários ou das respostas de quem está refinando. Se algo é dedução sua, confirme na conversa antes de colocar na descrição.
 - **Sem enchimento.** Cada frase precisa dizer a quem vai desenvolver algo que essa pessoa precisa saber. Não escreva introdução, conclusão, lista de benefícios, "considerações" nem frase que só repete o título. Não use emojis. Tarefa simples tem descrição curta.
 - **Critérios verificáveis.** "A tela deve ser rápida" não serve. "A listagem carrega em até 2 segundos com 1.000 registros" serve, desde que o número tenha vindo de quem está refinando.
+- **Sem dado sensível.** A descrição fica visível para quem acessa a tarefa. Não coloque dados de clientes, credenciais nem valores reais de transações. Em tarefa de segurança, descreva o que precisa passar a ser barrado e deixe de fora o passo a passo de como explorar a falha.
 - **Tamanho de tarefa, não de documento.** A especificação detalhada vem em outra etapa. A descrição deve ser entendida em uma leitura.
 - **Português**, com frases completas e os termos que o time já usa na tarefa.
