@@ -21,16 +21,30 @@ Os arquivos ficam em `.claude/`, no mesmo formato que o Claude Code lê. Assim, 
     ├── agents/
     │   └── revisor-de-codigo.md
     └── skills/
+        ├── coding-guidelines/
+        │   └── SKILL.md
         ├── descricao-de-pr/
+        │   └── SKILL.md
+        ├── desenvolver-tarefa/
         │   └── SKILL.md
         ├── gerar-prd/
         │   └── SKILL.md
         ├── refinar-tarefa/
         │   └── SKILL.md
-        └── setup/
+        ├── revisar-pr/
+        │   └── SKILL.md
+        ├── security-check/
+        │   └── SKILL.md
+        ├── setup/
+        │   ├── SKILL.md
+        │   └── checar.sh
+        └── tlc-spec-driven/
+            ├── README.md
             ├── SKILL.md
-            └── checar.sh
+            └── references/
 ```
+
+O guia do fluxo fica em [docs/fluxo-de-desenvolvimento.md](docs/fluxo-de-desenvolvimento.md).
 
 - Cada agent é um arquivo `.md` em `.claude/agents/`.
 - Cada skill é uma pasta em `.claude/skills/` com um `SKILL.md` dentro, mais os arquivos de apoio que ela precisar.
@@ -45,8 +59,34 @@ Os arquivos ficam em `.claude/`, no mesmo formato que o Claude Code lê. Assim, 
 | [descricao-de-pr](.claude/skills/descricao-de-pr/SKILL.md) | Skill | Escreve a descrição de um pull request a partir das alterações da branch atual. |
 | [gerar-prd](.claude/skills/gerar-prd/SKILL.md) | Skill | Gera o PRD de uma tarefa do Jira já refinada: avalia se a tarefa precisa de PRD, tira as dúvidas, escreve o documento e, depois do aceite, grava como comentário na tarefa e move para "PRD em revisão". Precisa do MCP do Jira configurado. Uso: `/gerar-prd ABC-123` ou `/gerar-prd <link da tarefa>`. |
 | [setup](.claude/skills/setup/SKILL.md) | Skill | Prepara a máquina: copia os agents e as skills para a pasta pessoal do Claude Code e configura o MCP do Jira. Só funciona dentro deste repositório. |
+| [desenvolver-tarefa](.claude/skills/desenvolver-tarefa/SKILL.md) | Skill | Desenvolve uma tarefa do Jira pelo fluxo spec-driven: lê a tarefa e o PRD, prepara o repositório do projeto e conduz a especificação e a implementação com o `tlc-spec-driven`, fechando com checagem de segurança, revisão e descrição do PR. Precisa do MCP do Jira configurado. Uso: `/desenvolver-tarefa ABC-123`, no repositório do projeto. |
+| [tlc-spec-driven](.claude/skills/tlc-spec-driven/SKILL.md) | Skill | Framework de desenvolvimento spec-driven em quatro fases (especificar, desenhar, quebrar em passos e executar), com a profundidade ajustada ao tamanho da mudança. De terceiros, em inglês. |
+| [revisar-pr](.claude/skills/revisar-pr/SKILL.md) | Skill | Revisa o PR de outra pessoa e entrega um relatório classificado em Blocking, High, Medium e Suggestions, com a regra de quando aprovar e o comentário pronto para o PR. |
+| [security-check](.claude/skills/security-check/SKILL.md) | Skill | Checagem de segurança do projeto, de um caminho ou só das mudanças pendentes (`/security-check diff`): vulnerabilidades, segredos vazados, injeção e problemas de autenticação. |
+| [coding-guidelines](.claude/skills/coding-guidelines/SKILL.md) | Skill | Diretrizes de comportamento para reduzir erros comuns de IA ao escrever código. De terceiros, em inglês. |
 
 O `revisor-de-codigo` e a `descricao-de-pr` servem de exemplo para quem for criar os próximos.
+
+### Skills de terceiros
+
+Estas skills não foram escritas pelo time. São cópias sem alteração, mantidas aqui para todo mundo usar a mesma versão.
+
+| Skill | Origem | Licença |
+| --- | --- | --- |
+| `tlc-spec-driven` 2.0.0 | [Tech Lead's Club](https://github.com/tech-leads-club/agent-skills), de Felipe Rodrigues | CC-BY-4.0 |
+| `coding-guidelines` 1.0.0 | Catálogo do [Tech Lead's Club](https://github.com/tech-leads-club/agent-skills), autor "ale", com base nas diretrizes de Andrej Karpathy | CC-BY-4.0, que é o padrão do catálogo. A skill não declara licença própria. |
+
+Para atualizar uma delas, substitua a pasta pela versão nova e ajuste a versão nesta tabela. Não edite os arquivos: uma cópia alterada deixa de bater com a original e complica a próxima atualização.
+
+## Fluxo de desenvolvimento
+
+O time trabalha no modelo spec-driven: a tarefa é refinada no Jira, ganha um PRD quando precisa e só então vai para o desenvolvimento, que usa o TLC Spec-Driven para especificar e implementar.
+
+```
+/refinar-tarefa  →  /gerar-prd  →  /desenvolver-tarefa  →  /revisar-pr
+```
+
+O passo a passo, com quem faz cada etapa e o que sai dela, está em [docs/fluxo-de-desenvolvimento.md](docs/fluxo-de-desenvolvimento.md).
 
 ## Como usar
 
