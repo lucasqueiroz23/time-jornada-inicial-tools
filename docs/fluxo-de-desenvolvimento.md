@@ -17,7 +17,7 @@ O motivo é simples. Uma tarefa vaga entregue a uma IA vira código que parece c
 
 As etapas 4 e 5 já fazem parte da `/desenvolver-tarefa`, que chama as ferramentas no fim da implementação. Elas aparecem separadas porque também funcionam sozinhas.
 
-Nem toda tarefa passa pela etapa 2. A `/gerar-prd` avalia a tarefa e diz quando o PRD não se paga.
+A etapa 2 vale para qualquer tipo de tarefa. A `/gerar-prd` ajusta o tamanho do documento ao tipo dela: o PRD de uma correção pequena cabe em poucas linhas.
 
 ## A etapa de desenvolvimento por dentro
 
