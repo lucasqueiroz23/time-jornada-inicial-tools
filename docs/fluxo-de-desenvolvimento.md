@@ -17,7 +17,7 @@ O motivo é simples. Uma tarefa vaga entregue a uma IA vira código que parece c
 
 As etapas 4 e 5 já fazem parte da `/desenvolver-tarefa`, que chama as ferramentas no fim da implementação. Elas aparecem separadas porque também funcionam sozinhas.
 
-Nem toda tarefa passa pela etapa 2. A `/gerar-prd` avalia a tarefa e diz quando o PRD não se paga.
+A etapa 2 vale para qualquer tipo de tarefa. A `/gerar-prd` ajusta o tamanho do documento ao tipo dela: o PRD de uma correção pequena cabe em poucas linhas.
 
 ## A etapa de desenvolvimento por dentro
 
@@ -87,5 +87,5 @@ Nenhuma skill grava ou move nada no Jira sem um aceite explícito na conversa.
 ## Para começar
 
 1. Clone este repositório e abra o Claude Code na raiz dele.
-2. Rode `/setup`. Ele copia as skills e os agents para a sua pasta pessoal e configura o MCP do Jira.
+2. Rode `/setup`. Ele copia as skills e os agents para a sua pasta pessoal, configura o MCP do Jira e oferece o kit de orquestração, que é opcional.
 3. Abra o Claude Code no repositório do projeto e rode `/desenvolver-tarefa` com a chave da tarefa.

@@ -1,6 +1,6 @@
 ---
 name: setup
-description: Prepara a máquina de quem vai usar as ferramentas deste repositório. Verifica o que falta, copia os agents e as skills para a pasta pessoal do Claude Code e configura o MCP do Jira. Rode com /setup para instalar, configurar ou atualizar as ferramentas do time.
+description: Prepara a máquina de quem vai usar as ferramentas deste repositório. Verifica o que falta, copia os agents e as skills para a pasta pessoal do Claude Code, configura o MCP do Jira e oferece o kit de orquestração, que é opcional. Rode com /setup para instalar, configurar ou atualizar as ferramentas do time.
 disable-model-invocation: true
 ---
 
@@ -45,7 +45,7 @@ A pasta pessoal é a que estiver em `CLAUDE_CONFIG_DIR` ou, se a variável não 
 
 Mostre uma tabela curta com o que já está pronto e o que será feito.
 
-Não há nada a fazer quando todos os agents e skills estão `igual` e o MCP é `oficial` conectado, `outro` conectado ou `sem-cli`. Nesse caso, diga isso e pule para o passo 6. No `sem-cli`, o resumo do passo 6 precisa dizer que o MCP não foi verificado.
+Não há nada a fazer quando todos os agents e skills estão `igual` e o MCP é `oficial` conectado, `outro` conectado ou `sem-cli`. Nesse caso, diga isso e pule para o passo 6, que oferece o kit de orquestração. No `sem-cli`, o resumo do passo 7 precisa dizer que o MCP não foi verificado.
 
 Nos outros casos, só siga depois que a pessoa aceitar. O setup grava fora do repositório, na pasta pessoal dela, e ela precisa saber disso antes.
 
@@ -84,12 +84,53 @@ Esses três passos valem para quem tem o comando `claude`. No caso `sem-cli`, o 
 
 Um servidor recém-adicionado só aparece em uma sessão nova. Avise que é preciso fechar e abrir o Claude Code depois do setup.
 
-### 6. Diga como ficou
+### 6. Ofereça o kit de orquestração
+
+O kit é opcional e é para quem desenvolve. Não ofereça a quem só vai refinar tarefas ou gerar PRD: para essa pessoa, diga em uma frase que ele existe e siga para o resumo.
+
+Ele muda o jeito de o Claude Code trabalhar em todos os projetos da pessoa: a sessão principal passa a coordenar, e o trabalho mecânico vai para subagentes com modelos mais baratos (`varredor`, `pesquisador`, `executor` e `revisor`, copiados no passo 4). Além dos agents, o kit instala:
+
+- uma regra em `rules/orquestracao.md`, que diz o que delegar e para quem;
+- quatro hooks em `hooks/`. Um deles impede o Claude de encerrar a resposta, uma vez, quando um subagente editou arquivos e nenhum `revisor` conferiu;
+- quatro entradas de hook e duas variáveis de ambiente no `settings.json` da pessoa, que fazem os subagentes usarem o Sonnet por padrão e os impedem de criar outros subagentes.
+
+Veja o estado atual com o comando abaixo. Ele só lê.
+
+```bash
+python3 .claude/skills/setup/orquestracao.py checar
+```
+
+Trate estes casos antes de oferecer:
+
+- **O `python3` não existe na máquina:** diga que o kit depende dele e pule este passo.
+- **A saída traz `settings erro`:** o `settings.json` da pessoa está fora do formato esperado e o script não vai mexer nele. Mostre o erro, registre como pendência e pule este passo.
+- **Tudo está `igual` e `ok`:** diga que o kit já está instalado e siga.
+- **Algum dos agents `varredor`, `pesquisador`, `executor` ou `revisor` não ficou instalado no passo 4:** a regra e os hooks dependem deles. Diga isso e só ofereça o kit se a pessoa aceitar copiar os agents antes.
+
+Explique o que muda com as palavras acima e pergunte se a pessoa quer instalar. Este é o único passo do setup que altera o `settings.json`, então o aceite precisa ser específico para ele: o aceite do passo 3 não vale aqui. Depois do aceite:
+
+```bash
+python3 .claude/skills/setup/orquestracao.py instalar
+```
+
+O comando termina com código 0 quando instalou tudo, 2 quando instalou mas manteve algum arquivo que a pessoa já tinha, e 1 quando nada foi alterado por causa de um erro. O código 2 não é falha.
+
+Leia a saída e repasse o que importa:
+
+- **`arquivo mantido`:** a pessoa já tinha esse arquivo com outro conteúdo, e ele não foi trocado. Se for um hook, a linha `config pulado` avisa que ele também não foi registrado no `settings.json`. O `--substituir` troca todos os arquivos mantidos de uma vez, então antes mostre a diferença de cada um com `diff -u <pasta pessoal>/<arquivo> .claude/skills/setup/orquestracao/<arquivo>` e peça o aceite. Se a pessoa quiser manter algum deles, não rode o `--substituir`: diga que o kit ficou parcial e quais partes ficaram de fora.
+- **`env mantido`:** a variável já existia com outro valor e não foi alterada. Diga qual valor ficou e qual o kit sugere, e deixe a decisão com a pessoa.
+- **`copia`:** o caminho da cópia do `settings.json` feita antes da alteração. Informe no resumo.
+- **`settings erro`:** nada foi alterado. Mostre o erro e registre como pendência.
+
+Não edite o `settings.json` à mão para completar o que o script não fez. Para desfazer a instalação, o comando é `python3 .claude/skills/setup/orquestracao.py remover`.
+
+### 7. Diga como ficou
 
 Feche com um resumo curto:
 
 - o que foi copiado, o que já estava atualizado e o que a pessoa preferiu manter;
 - como ficou o MCP do Jira;
+- se o kit de orquestração foi instalado, recusado ou não oferecido e, quando instalado, onde está a cópia do `settings.json` e como desfazer;
 - o que ainda depende dela, como o login no navegador, um MCP com falha ou reabrir o Claude Code;
 - um exemplo de uso para testar, escolhido entre as skills que ficaram instaladas.
 
@@ -97,6 +138,6 @@ Se algum passo falhou, mostre o erro e diga o que não foi feito. Não descreva 
 
 ## Regras
 
-- **Nada fora do combinado.** O setup só mexe em `agents/` e `skills/` da pasta pessoal e na configuração de MCP do Claude Code. Não instala programas, não altera `settings.json` e não mexe no repositório.
+- **Nada fora do combinado.** O setup só mexe em `agents/` e `skills/` da pasta pessoal e na configuração de MCP do Claude Code. Não instala programas e não mexe no repositório. O `settings.json`, `rules/` e `hooks/` só são alterados pelo script do kit de orquestração, no passo 6, com aceite próprio. O script deixa uma cópia do `settings.json` ao lado do original, e os hooks, quando rodam, guardam um marcador por sessão em `state/`.
 - **Nunca substitua sem mostrar.** Arquivo diferente só é trocado depois de a pessoa ver a diferença e aceitar.
 - **Sem credenciais.** Não peça, não leia e não grave token, senha ou e-mail de ninguém. Não rode comandos que imprimam a configuração dos servidores MCP, como `claude mcp get`, porque ela pode conter tokens.
