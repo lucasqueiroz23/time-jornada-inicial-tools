@@ -87,5 +87,5 @@ Nenhuma skill grava ou move nada no Jira sem um aceite explícito na conversa.
 ## Para começar
 
 1. Clone este repositório e abra o Claude Code na raiz dele.
-2. Rode `/setup`. Ele copia as skills e os agents para a sua pasta pessoal e configura o MCP do Jira.
+2. Rode `/setup`. Ele copia as skills e os agents para a sua pasta pessoal, configura o MCP do Jira e oferece o kit de orquestração, que é opcional.
 3. Abra o Claude Code no repositório do projeto e rode `/desenvolver-tarefa` com a chave da tarefa.

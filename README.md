@@ -19,7 +19,11 @@ Os arquivos ficam em `.claude/`, no mesmo formato que o Claude Code lê. Assim, 
 .
 └── .claude/
     ├── agents/
-    │   └── revisor-de-codigo.md
+    │   ├── executor.md
+    │   ├── pesquisador.md
+    │   ├── revisor-de-codigo.md
+    │   ├── revisor.md
+    │   └── varredor.md
     └── skills/
         ├── coding-guidelines/
         │   └── SKILL.md
@@ -37,7 +41,9 @@ Os arquivos ficam em `.claude/`, no mesmo formato que o Claude Code lê. Assim, 
         │   └── SKILL.md
         ├── setup/
         │   ├── SKILL.md
-        │   └── checar.sh
+        │   ├── checar.sh
+        │   ├── orquestracao.py
+        │   └── orquestracao/
         └── tlc-spec-driven/
             ├── README.md
             ├── SKILL.md
@@ -58,12 +64,16 @@ O guia do fluxo fica em [docs/fluxo-de-desenvolvimento.md](docs/fluxo-de-desenvo
 | [revisor-de-codigo](.claude/agents/revisor-de-codigo.md) | Agent | Revisa as alterações locais ou de uma branch em busca de bugs, riscos e pontos de melhoria. |
 | [descricao-de-pr](.claude/skills/descricao-de-pr/SKILL.md) | Skill | Escreve a descrição de um pull request a partir das alterações da branch atual. |
 | [gerar-prd](.claude/skills/gerar-prd/SKILL.md) | Skill | Gera o PRD de uma tarefa do Jira já refinada: avalia se a tarefa precisa de PRD, tira as dúvidas, escreve o documento e, depois do aceite, grava como comentário na tarefa e move para "PRD em revisão". Precisa do MCP do Jira configurado. Uso: `/gerar-prd ABC-123` ou `/gerar-prd <link da tarefa>`. |
-| [setup](.claude/skills/setup/SKILL.md) | Skill | Prepara a máquina: copia os agents e as skills para a pasta pessoal do Claude Code e configura o MCP do Jira. Só funciona dentro deste repositório. |
+| [setup](.claude/skills/setup/SKILL.md) | Skill | Prepara a máquina: copia os agents e as skills para a pasta pessoal do Claude Code, configura o MCP do Jira e oferece o kit de orquestração. Só funciona dentro deste repositório. |
 | [desenvolver-tarefa](.claude/skills/desenvolver-tarefa/SKILL.md) | Skill | Desenvolve uma tarefa do Jira pelo fluxo spec-driven: lê a tarefa e o PRD, prepara o repositório do projeto e conduz a especificação e a implementação com o `tlc-spec-driven`, fechando com checagem de segurança, revisão e descrição do PR. Precisa do MCP do Jira configurado. Uso: `/desenvolver-tarefa ABC-123`, no repositório do projeto. |
 | [tlc-spec-driven](.claude/skills/tlc-spec-driven/SKILL.md) | Skill | Framework de desenvolvimento spec-driven em quatro fases (especificar, desenhar, quebrar em passos e executar), com a profundidade ajustada ao tamanho da mudança. De terceiros, em inglês. |
 | [revisar-pr](.claude/skills/revisar-pr/SKILL.md) | Skill | Revisa o PR de outra pessoa e entrega um relatório classificado em Blocking, High, Medium e Suggestions, com a regra de quando aprovar e o comentário pronto para o PR. |
 | [security-check](.claude/skills/security-check/SKILL.md) | Skill | Checagem de segurança do projeto, de um caminho ou só das mudanças pendentes (`/security-check diff`): vulnerabilidades, segredos vazados, injeção e problemas de autenticação. |
 | [coding-guidelines](.claude/skills/coding-guidelines/SKILL.md) | Skill | Diretrizes de comportamento para reduzir erros comuns de IA ao escrever código. De terceiros, em inglês. |
+| [varredor](.claude/agents/varredor.md) | Agent | Trabalho mecânico com critério objetivo, no Haiku: varrer arquivos, contar, listar, extrair, resumir um log ou um documento longo. Só lê. |
+| [pesquisador](.claude/agents/pesquisador.md) | Agent | Pesquisa em código e documentação, no Sonnet: onde algo mora, como um fluxo funciona, onde algo é usado. Só lê. |
+| [executor](.claude/agents/executor.md) | Agent | Implementa uma mudança já delimitada, no Sonnet: código, testes, correção de bug com reprodução conhecida. |
+| [revisor](.claude/agents/revisor.md) | Agent | Revisa um diff ou um conjunto de arquivos contra os critérios que recebe, no Sonnet. Só lê. É o revisor independente do kit de orquestração. |
 
 O `revisor-de-codigo` e a `descricao-de-pr` servem de exemplo para quem for criar os próximos.
 
@@ -88,6 +98,35 @@ O time trabalha no modelo spec-driven: a tarefa é refinada no Jira, ganha um PR
 
 O passo a passo, com quem faz cada etapa e o que sai dela, está em [docs/fluxo-de-desenvolvimento.md](docs/fluxo-de-desenvolvimento.md).
 
+## Kit de orquestração
+
+Opcional, para quem desenvolve. Com o kit, a sessão principal do Claude Code passa a coordenar, e o trabalho mecânico ou volumoso vai para subagentes com modelos mais baratos. A regra pede que toda mudança de arquivo feita por um subagente passe por um revisor independente antes de chegar a você, e um hook lembra o Claude disso quando ele esquece.
+
+| Parte | O que é |
+| --- | --- |
+| Agents | `varredor`, `pesquisador`, `executor` e `revisor`. São copiados pelo `/setup` como os outros agents e funcionam mesmo sem o resto do kit. |
+| Regra | [regra.md](.claude/skills/setup/orquestracao/regra.md): o que a sessão principal delega, para quem, como escrever o pedido e como conferir o que volta. |
+| Hooks | Um injeta em todo subagente, de qualquer projeto, o contrato de executor: fazer o que foi pedido e responder curto. Os outros três formam a trava da revisão: se um subagente editou arquivos com as ferramentas de edição e nenhum `revisor` rodou, o Claude é impedido de encerrar a resposta, uma vez, com o lembrete. Edição feita por comando de terminal não é detectada. |
+| Configuração | Duas variáveis de ambiente: os subagentes usam o Sonnet por padrão e não podem criar outros subagentes. |
+
+O `/setup` oferece o kit no fim e só instala com um aceite específico, porque ele altera o `settings.json` da sua pasta pessoal e vale para todos os seus projetos. Antes de alterar, o instalador grava uma cópia do arquivo. Ele nunca troca uma variável que você já tinha com outro valor, nem um arquivo seu com conteúdo diferente.
+
+Para ver o estado, instalar ou desfazer fora do `/setup`, na raiz deste repositório:
+
+```bash
+python3 .claude/skills/setup/orquestracao.py checar
+```
+
+```bash
+python3 .claude/skills/setup/orquestracao.py instalar
+```
+
+```bash
+python3 .claude/skills/setup/orquestracao.py remover
+```
+
+O `revisor` e o `revisor-de-codigo` são diferentes. O `revisor` confere uma mudança contra os critérios que recebe e é chamado pela sessão principal durante o trabalho. O `revisor-de-codigo` você chama antes de abrir o PR, para uma revisão geral da sua mudança.
+
 ## Como usar
 
 ### Setup
@@ -95,6 +134,7 @@ O passo a passo, com quem faz cada etapa e o que sai dela, está em [docs/fluxo-
 Abra o Claude Code na raiz do repositório e rode `/setup`. A skill verifica o que falta na sua máquina, mostra o que vai fazer e, depois do seu aceite:
 
 - copia os agents e as skills para `~/.claude`, para valerem em todos os seus projetos;
+- oferece o [kit de orquestração](#kit-de-orquestração), que é opcional;
 - configura o MCP oficial da Atlassian, se você ainda não tiver nenhum MCP de Jira. Skills que leem ou gravam no Jira dependem dele.
 
 O login no Jira é feito por você no navegador, com a sua conta Atlassian. O setup não pede token nem senha.
