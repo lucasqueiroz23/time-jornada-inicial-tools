@@ -7,6 +7,7 @@
 # Saída, uma linha por item:
 #   agent <faltando|igual|diferente> <arquivo>
 #   skill <faltando|igual|diferente> <pasta>
+#   skill aposentada <pasta>
 #   mcp   <oficial|outro|faltando|erro|sem-cli> [linha do "claude mcp list"]
 set -u
 
@@ -16,7 +17,7 @@ destino="${CLAUDE_CONFIG_DIR:-$HOME/.claude}"
 estado() {
   if [ ! -e "$2" ]; then
     echo faltando
-  elif diff -rq -x .DS_Store -x .skill-meta.json "$1" "$2" >/dev/null 2>&1; then
+  elif diff -rq -x .DS_Store -x .skill-meta.json -x __pycache__ "$1" "$2" >/dev/null 2>&1; then
     echo igual
   else
     echo diferente
@@ -35,6 +36,14 @@ for skill in "$raiz"/.claude/skills/*/; do
   # A skill setup só faz sentido dentro deste repositório.
   [ "$nome" = "setup" ] && continue
   echo "skill $(estado "${skill%/}" "$destino/skills/$nome") $nome"
+done
+
+# Skills que já estiveram neste repositório e saíram. O setup não copia mais,
+# mas a cópia antiga continua na pasta pessoal de quem instalou antes.
+for nome in tlc-spec-driven; do
+  if [ -e "$destino/skills/$nome" ]; then
+    echo "skill aposentada $nome"
+  fi
 done
 
 if ! command -v claude >/dev/null 2>&1; then

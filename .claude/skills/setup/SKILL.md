@@ -31,6 +31,7 @@ Cada linha da saída é um item:
 | `agent faltando` ou `skill faltando` | Ainda não está na pasta pessoal. |
 | `agent igual` ou `skill igual` | Já está instalado e atualizado. |
 | `agent diferente` ou `skill diferente` | Existe na pasta pessoal, mas com conteúdo diferente do repositório. |
+| `skill aposentada` | A skill saiu deste repositório, mas a cópia antiga continua na pasta pessoal. |
 | `mcp oficial` | O MCP oficial da Atlassian já está configurado. |
 | `mcp outro` | Existe outro servidor MCP com "atlassian" ou "jira" no nome ou no comando, como o `mcp-atlassian`. |
 | `mcp faltando` | Não há MCP de Jira. |
@@ -45,7 +46,7 @@ A pasta pessoal é a que estiver em `CLAUDE_CONFIG_DIR` ou, se a variável não 
 
 Mostre uma tabela curta com o que já está pronto e o que será feito.
 
-Não há nada a fazer quando todos os agents e skills estão `igual` e o MCP é `oficial` conectado, `outro` conectado ou `sem-cli`. Nesse caso, diga isso e pule para o passo 6, que oferece o kit de orquestração. No `sem-cli`, o resumo do passo 7 precisa dizer que o MCP não foi verificado.
+Não há nada a fazer quando todos os agents e skills estão `igual`, não há nenhuma `skill aposentada` e o MCP é `oficial` conectado, `outro` conectado ou `sem-cli`. Nesse caso, diga isso e pule para o passo 6, que oferece o kit de orquestração. No `sem-cli`, o resumo do passo 7 precisa dizer que o MCP não foi verificado.
 
 Nos outros casos, só siga depois que a pessoa aceitar. O setup grava fora do repositório, na pasta pessoal dela, e ela precisa saber disso antes.
 
@@ -53,11 +54,13 @@ Nos outros casos, só siga depois que a pessoa aceitar. O setup grava fora do re
 
 - **Faltando:** copie. Agents vão para `agents/` da pasta pessoal e cada pasta de skill vai inteira para `skills/`. Crie as pastas se não existirem.
 - **Igual:** não faça nada.
-- **Diferente:** mostre o que muda com `diff -ru -x .DS_Store -x .skill-meta.json <pasta pessoal> <repositório>` e explique que as linhas com `-` são as da cópia da pessoa e as com `+` são as do repositório. Pergunte, item por item, se pode substituir. A diferença pode ser uma versão antiga, mas também pode ser um ajuste que a pessoa fez de propósito, e substituir apaga esse ajuste.
+- **Diferente:** mostre o que muda com `diff -ru -x .DS_Store -x .skill-meta.json -x __pycache__ <pasta pessoal> <repositório>` e explique que as linhas com `-` são as da cópia da pessoa e as com `+` são as do repositório. Pergunte, item por item, se pode substituir. A diferença pode ser uma versão antiga, mas também pode ser um ajuste que a pessoa fez de propósito, e substituir apaga esse ajuste.
 
 Para substituir uma skill, copie por cima com `cp -R <repositório>/. <pasta pessoal>/`. Não apague a pasta antes: ela pode ter arquivos que a pessoa criou e que não existem no repositório.
 
 Não copie a skill `setup`. Fora deste repositório ela não tem de onde copiar.
+
+- **Aposentada:** hoje é só a `tlc-spec-driven`, que o time trocou pela `tlc-spec-lean`. Explique que a `/desenvolver-tarefa` não a usa mais e que, com as duas instaladas, o Claude pode escolher a antiga ao ouvir "especificar" ou "implementar". Ofereça apagar a pasta e só apague com o aceite da pessoa: ela pode ter instalado a skill por conta própria, de outra fonte, e querer manter.
 
 ### 5. Configure o MCP do Jira
 
