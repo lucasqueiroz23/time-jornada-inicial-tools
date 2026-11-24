@@ -1,6 +1,6 @@
 ---
 name: desenvolver-tarefa
-description: Desenvolve uma tarefa do Jira seguindo o fluxo spec-driven do time. Lê a tarefa e o PRD, confere se ela está pronta, prepara o repositório do projeto e conduz a especificação e a implementação com a skill tlc-spec-driven, fechando com checagem de segurança, revisão e descrição do PR. Use quando alguém pedir para desenvolver, implementar ou começar uma tarefa do Jira.
+description: Desenvolve uma tarefa do Jira seguindo o fluxo spec-driven do time. Lê a tarefa e o PRD, confere se ela está pronta, prepara o repositório do projeto e conduz a especificação e a implementação com a skill tlc-spec-driven, fechando com checagem de segurança, revisão, descrição do PR e a atualização do status da tarefa no Jira. Use quando alguém pedir para desenvolver, implementar ou começar uma tarefa do Jira.
 argument-hint: "[chave ou link da tarefa]"
 ---
 
@@ -20,13 +20,23 @@ Esta skill roda no repositório do projeto que a tarefa altera, não no reposit�
 
 A pessoa pode informar a chave (como `ABC-123`) ou colar o link; no caso do link, tire a chave dele. Se não veio nenhum dos dois, peça.
 
-Leia o título, a descrição, o status, os comentários, a tarefa pai ou o épico e as tarefas ligadas.
+Leia o título, a descrição, o status, os comentários, a tarefa pai ou o épico e as tarefas ligadas. Se a sessão tiver a ferramenta de informações de desenvolvimento do Jira, veja também os PRs ligados à tarefa e se estão abertos ou mesclados.
 
 Procure o PRD nos comentários. O comentário de PRD é o que começa exatamente com o cabeçalho `PRD - AAAA-MM-DD`. Se houver mais de um, vale o mais recente. Leia também os comentários feitos depois dele: são a revisão do time e podem ter mudado algum requisito.
 
 Se a sessão não tiver ferramentas do Jira, avise que é preciso configurar o MCP do Jira (Atlassian) e pare.
 
 ### 2. Confira se a tarefa está pronta
+
+Olhe primeiro os PRs da tarefa. O estado deles vale mais do que o status, que costuma ficar para trás. Sem a ferramenta de informações de desenvolvimento, pergunte à pessoa pelos PRs só quando a tarefa já estiver em andamento ou adiante.
+
+| PRs da tarefa | O que fazer |
+| --- | --- |
+| Há pelo menos um PR, e todos estão mesclados | O desenvolvimento acabou. Confirme com a pessoa que não falta nada e vá direto para o passo 7, para oferecer o próximo status. Vale para qualquer status que não seja o de concluída, mesmo um de pendente. |
+| Há PR aberto, mesmo que outro esteja mesclado ou fechado | Costuma ser um ajuste pedido na revisão. Siga para o passo 3 e retome o trabalho na branch da tarefa. Se a tarefa ainda não está no status de revisão, ofereça também o comentário e a mudança de status do passo 7. |
+| Há PR fechado sem merge | Não conta como aberto nem como mesclado. Mostre à pessoa e pergunte o que ela quer fazer. |
+
+Se nenhuma linha acima se aplica, vale o status:
 
 | Situação | O que fazer |
 | --- | --- |
@@ -35,6 +45,7 @@ Se a sessão não tiver ferramentas do Jira, avise que é preciso configurar o M
 | Status "Refinado", sem PRD | Siga quando a descrição basta para desenvolver, como em correção de bug, ajuste pequeno ou tarefa técnica. Se a tarefa muda regra de negócio ou comportamento que o usuário percebe, sugira gerar o PRD antes, com a skill `gerar-prd` se ela estiver instalada, e deixe a pessoa decidir. |
 | Ainda não refinada, ou com a descrição vazia | Diga que falta refinar e sugira a skill `refinar-tarefa`, se estiver instalada. Desenvolver em cima de uma tarefa vaga é a principal causa de entrega errada. Siga só se a pessoa insistir. |
 | Em andamento | Pode ser trabalho retomado. Siga para o passo 3 e veja se já existe especificação no repositório. |
+| Na espera de deploy | Pergunte se a mudança já está em produção e vá para o passo 7. |
 | Concluída, ou em um status que não está nesta tabela | Avise e pergunte o que a pessoa quer fazer. |
 
 Diga em poucas frases o que você entendeu da tarefa e de onde veio cada informação: descrição, PRD ou comentários.
@@ -47,7 +58,7 @@ Diga em poucas frases o que você entendeu da tarefa e de onde veio cada informa
 - Olhe o `git status`. Se houver mudanças pendentes que não são desta tarefa, ou se a branch atual for de outra tarefa, mostre isso e pergunte como seguir. Não misture nem descarte o trabalho que já está lá.
 - Não trabalhe direto na branch principal. Se a pessoa ainda está nela, crie uma branch seguindo a convenção do repositório. Se o repositório não define uma, use a chave da tarefa no nome, como `feat/ABC-123-resumo-curto`.
 - Se o projeto ainda não tem `.specs/codebase/`, explique que o TLC consegue mapear o código existente uma vez, que isso melhora as especificações seguintes e que leva alguns minutos. Pergunte se a pessoa quer fazer agora. Não é obrigatório.
-- Ofereça mover a tarefa no Jira para o status de em andamento. Só mova com aceite explícito, como em toda escrita no Jira (passo 7).
+- Se a tarefa ainda não está em andamento nem em revisão, ofereça mover a tarefa no Jira para o status de em andamento. Só mova com aceite explícito, como em toda escrita no Jira (passo 7).
 
 ### 4. Entregue a tarefa ao TLC
 
@@ -94,9 +105,15 @@ Só faça push e abra o PR se a pessoa pedir.
 Escrever no Jira é uma ação visível para o time. Proponha e só faça depois de um aceite explícito:
 
 - **No começo do trabalho:** a mudança para o status de em andamento, oferecida no passo 3.
-- **No fim:** ofereça um comentário curto com o link do PR, o que foi entregue e as divergências em relação ao PRD, se houver.
+- **Quando o PR for aberto:** ofereça um comentário curto com o link do PR, o que foi entregue e as divergências em relação ao PRD, se houver. Na mesma proposta, ofereça mover a tarefa para o status de revisão, como "EM REVIEW". Se a tarefa tem PR em mais de um repositório, liste todos no comentário e diga em que ordem devem ser mesclados, se a ordem importar. Vale também quando a pessoa abriu o PR por conta própria e a tarefa ainda não está em revisão.
+- **Depois do merge:** ofereça mover a tarefa para o status de espera de deploy, como "AGUARDANDO DEPLOY", quando todos os PRs dela estiverem mesclados e ela ainda não estiver nesse status. Um PR ainda aberto segura a tarefa em revisão.
+- **Concluída:** quando todos os PRs estiverem mesclados, ou a tarefa já estiver na espera de deploy, pergunte se a mudança já está em produção. Só ofereça mover para o status de concluído depois de a pessoa confirmar. PR mesclado não é deploy.
 
-Não mude a descrição, o PRD nem o responsável. Se o Jira não oferecer a transição, não mova para outro status: avise que a tarefa precisa ser movida à mão.
+Para saber em que ponto os PRs estão, consulte as informações de desenvolvimento da tarefa no Jira, se a sessão tiver essa ferramenta. Se não tiver, pergunte à pessoa.
+
+O merge quase sempre acontece dias depois, fora desta sessão, e nenhuma skill enxerga esse momento. Por isso, se a sessão terminar com o PR aberto, ou sem PR porque a pessoa não pediu para abrir, diga em uma frase em que status a tarefa ficou e o que falta para ela andar: mover à mão depois do merge ou chamar esta skill de novo com a mesma chave. O mesmo vale para a tarefa que ficou na espera de deploy: ela só vira concluída quando alguém mover depois do deploy. Não deixe a pessoa achar que a tarefa fecha sozinha.
+
+Não mude a descrição, o PRD nem o responsável. Os nomes de status mudam de projeto para projeto: use o que o Jira oferecer como transição para aquele momento. Se o Jira não oferecer a transição, não mova para outro status: avise que a tarefa precisa ser movida à mão.
 
 ## Regras
 
