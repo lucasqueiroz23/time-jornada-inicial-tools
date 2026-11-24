@@ -81,8 +81,23 @@ Quando você quiser usar o TLC sem passar pelo Jira, estas frases acionam cada p
 | PRD em revisão | O PRD está na tarefa, esperando a revisão do time. | A `/gerar-prd`, depois do aceite. |
 | PRD aprovado | O time revisou e concorda com os requisitos. | O time, à mão. |
 | Em andamento | Alguém começou a desenvolver. | A `/desenvolver-tarefa`, depois do aceite. |
+| EM REVIEW | O PR está aberto, esperando a revisão. | A `/desenvolver-tarefa`, depois do aceite, quando o PR é aberto. |
+| AGUARDANDO DEPLOY | Todos os PRs da tarefa foram mesclados e a mudança ainda não está em produção. | Quem fez o merge, à mão, ou a `/desenvolver-tarefa` chamada de novo com a mesma chave. |
+| Concluído | A mudança está em produção. | Quem acompanhou o deploy, à mão, ou a `/desenvolver-tarefa`, depois do aceite e da confirmação de que está em produção. |
 
 Nenhuma skill grava ou move nada no Jira sem um aceite explícito na conversa.
+
+### Depois do merge
+
+O merge acontece no repositório, dias depois do desenvolvimento e fora de qualquer sessão do Claude Code. Nenhuma skill enxerga esse momento, então a tarefa não anda sozinha: ela fica em "EM REVIEW" até alguém mover.
+
+Há três jeitos de não deixar tarefa pronta parada:
+
+- Mover à mão logo depois do merge.
+- Rodar `/desenvolver-tarefa ABC-123` de novo. Ela confere os PRs da tarefa, ou pergunta a você se a sessão não tiver essa informação, e oferece mover.
+- Criar no Jira uma regra de automação que move a tarefa quando o PR é mesclado. É a única forma de pegar o merge sem depender de alguém lembrar, e precisa de quem administra o projeto no Jira.
+
+Merge não é deploy. A tarefa só vai para "Concluído" quando a mudança está em produção.
 
 ## Para começar
 
