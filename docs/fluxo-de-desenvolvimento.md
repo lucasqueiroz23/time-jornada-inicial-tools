@@ -10,68 +10,68 @@ O motivo é simples. Uma tarefa vaga entregue a uma IA vira código que parece c
 | --- | --- | --- | --- | --- |
 | 1. Refinar | Produto, projetos ou quem conhece a demanda | `/refinar-tarefa ABC-123` | Qualquer pasta | Descrição da tarefa reescrita, com critérios de aceite. Status "Refinado". |
 | 2. PRD | Quem conhece a demanda, com revisão do time | `/gerar-prd ABC-123` | Qualquer pasta | PRD em um comentário da tarefa, para o time revisar. |
-| 3. Desenvolver | Dev | `/desenvolver-tarefa ABC-123` | Repositório do projeto | Especificação em `.specs/`, código, testes e commits. |
-| 4. Revisar a própria mudança | Dev | Agent `revisor-de-codigo` e `/security-check` | Repositório do projeto | Achados corrigidos antes do PR. |
+| 3. Desenvolver | Dev | `/desenvolver-tarefa ABC-123` | Repositório do projeto | Plano em `.specs/`, código, testes, commits e o parecer de uma revisão independente. |
+| 4. Checar a própria mudança | Dev | `/security-check` e, se quiser uma segunda leitura, o agent `revisor-de-codigo` | Repositório do projeto | Achados corrigidos antes do PR. |
 | 5. Abrir o PR | Dev | `/descricao-de-pr` | Repositório do projeto | Descrição do PR com o que muda e como testar. |
 | 6. Revisar o PR de outra pessoa | Dev | `/revisar-pr <link>` | Repositório do projeto | Relatório em Blocking, High, Medium e Suggestions, e a decisão de aprovar. |
 
-As etapas 4 e 5 já fazem parte da `/desenvolver-tarefa`, que chama as ferramentas no fim da implementação. Elas aparecem separadas porque também funcionam sozinhas.
+As etapas 4 e 5 já fazem parte da `/desenvolver-tarefa`, que roda a checagem de segurança e escreve a descrição do PR no fim. O `revisor-de-codigo` fica para quando você pedir, porque a revisão independente do lean já aconteceu. Elas aparecem separadas porque também funcionam sozinhas.
 
 A etapa 2 vale para qualquer tipo de tarefa. A `/gerar-prd` ajusta o tamanho do documento ao tipo dela: o PRD de uma correção pequena cabe em poucas linhas.
 
 ## A etapa de desenvolvimento por dentro
 
-A `/desenvolver-tarefa` lê a tarefa e o PRD no Jira e conduz o [TLC Spec-Driven](../.claude/skills/tlc-spec-driven/README.md), o framework que o time adotou. Você conversa em português e não precisa decorar os comandos dele.
+A `/desenvolver-tarefa` lê a tarefa e o PRD no Jira e conduz o [TLC Spec Lean](../.claude/skills/tlc-spec-lean/SKILL.md), o framework que o time adotou. Você conversa em português e não precisa decorar os comandos dele.
 
-O TLC tem quatro fases e escolhe a profundidade pelo tamanho da mudança:
+O lean tem três fases:
 
 ```
-Especificar  →  Desenhar  →  Quebrar em passos  →  Executar
- obrigatória    opcional        opcional          obrigatória
+Plano  →  Build  →  Revisão
 ```
 
-| Tamanho da mudança | O que acontece |
-| --- | --- |
-| Pequena: até 3 arquivos, cabe em uma frase | Modo rápido: descreve, implementa, verifica e faz o commit. |
-| Média: funcionalidade clara | Especificação curta e implementação. |
-| Grande: vários componentes | Especificação com requisitos numerados, desenho e quebra em passos. |
-| Complexa: ambiguidade ou domínio novo | Tudo acima, mais discussão das áreas cinzentas, pesquisa e validação guiada. |
+| Fase | O que acontece | O que você faz |
+| --- | --- | --- |
+| Plano | As decisões de produto que faltam são perguntadas e o plano é escrito: o problema, o caminho pelo código, as decisões difíceis de reverter e os critérios de aceite, agrupados em fatias. | Responde às perguntas e aprova o plano. É a única parada obrigatória. |
+| Build | Uma fatia por vez, de ponta a ponta: código, testes e um commit. | Decide só o que o plano não previu. |
+| Revisão | Um subagente que não escreveu o código confere o pedido e o plano contra o que foi feito. Depois vem uma única rodada de correção. | Decide os achados que forem de produto. |
 
-O que o time já decidiu no Jira entra como ponto de partida: o TLC não pergunta de novo o que a tarefa e o PRD respondem. As perguntas dessa etapa são as técnicas.
+Uma fatia é um resultado que alguém consegue ver funcionando, cortado por todas as camadas que ele precisa. "A API" ou "a tela" são camadas, não fatias.
+
+Mudança pequena, de menos de três arquivos, mais ou menos, e sem decisão difícil de reverter, dispensa o plano. As perguntas e a revisão acontecem do mesmo jeito.
+
+O que o time já decidiu no Jira entra como ponto de partida: o lean não pergunta de novo o que a tarefa e o PRD respondem. As perguntas dessa etapa são as que o PRD deixou de fora, quase sempre as que só aparecem quando se olha o código.
 
 ### O que fica no repositório do projeto
 
-O TLC guarda o trabalho na pasta `.specs/` do projeto:
+O lean guarda o trabalho na pasta `.specs/` do projeto:
 
 ```
 .specs/
-├── project/      visão, roteiro e a memória de decisões do projeto
-├── codebase/     mapa do código existente: stack, arquitetura, convenções e testes
-├── features/     uma pasta por tarefa, com a especificação, o desenho e os passos
-└── quick/        tarefas pequenas feitas no modo rápido
+├── STATE.md                 decisões que as próximas tarefas precisam respeitar
+└── features/
+    └── abc-123-resumo-curto/
+        ├── request.md       o pedido como veio: a tarefa do Jira e o PRD
+        ├── plan.md          o plano aprovado e o registro da revisão
+        └── review.md        o parecer do revisor
 ```
 
-A pasta de cada tarefa leva a chave do Jira no nome, como `.specs/features/abc-123-resumo-curto/`. No modo rápido, ela fica em `.specs/quick/`, com a numeração do TLC na frente.
+A pasta de cada tarefa leva a chave do Jira no nome. Se o repositório do projeto ainda não tem nenhuma spec versionada, a `/desenvolver-tarefa` pergunta antes do primeiro commit se a pasta entra no git: é uma decisão do time daquele projeto.
 
-### Primeira vez em um projeto
+### Por que o lean
 
-Na primeira tarefa em um repositório, a `/desenvolver-tarefa` oferece mapear o código existente. Leva alguns minutos, acontece uma vez só e melhora todas as especificações seguintes, porque o TLC passa a conhecer a arquitetura, as convenções e como os testes rodam.
+O time começou com o `tlc-spec-driven` 2.0.0. Na hora de atualizar, testou em tarefas reais a versão nova dele, a 4.1.0, e o `tlc-spec-lean` 3.2.0, e ficou com o lean. A 4.1.0 do `tlc-spec-driven` não tem mais o modo rápido, registra um teste por critério e confere as etapas por script, o que pesa em tarefa pequena: no teste, uma correção de uma linha gerou uma especificação de nove critérios. O lean mantém o que deu resultado nos dois testes, que são as perguntas de produto antes de escrever, o teste para cada regra e o revisor que não é o autor, com uma parada só.
 
-### Falando direto com o TLC
+O `tlc-spec-driven` continua fazendo sentido para trabalho muito grande, em várias sessões, ou que precise de uma trilha de prova por critério. Se aparecer um caso assim, ele pode voltar para o repositório.
 
-Quando você quiser usar o TLC sem passar pelo Jira, estas frases acionam cada parte dele:
+### Falando direto com o lean
+
+Quando você quiser usar o lean sem passar pelo Jira, estas frases acionam cada parte dele:
 
 | Para | Diga |
 | --- | --- |
-| Mapear um projeto existente | `map codebase` |
-| Especificar uma funcionalidade | `specify feature <nome>` |
-| Discutir pontos em aberto | `discuss feature` |
-| Desenhar a solução | `design feature` |
-| Quebrar em passos | `break into tasks` |
-| Implementar | `implement` |
-| Validar o que foi feito | `validate` |
-| Fazer uma correção pequena | `quick fix: <descrição>` |
-| Parar e retomar depois | `pause work` e `resume work` |
+| Planejar uma funcionalidade | `plan feature <nome>` |
+| Construir um plano aprovado | `build this plan` |
+| Revisar o que foi construído | `review this work` |
 
 ## Os status no Jira
 
