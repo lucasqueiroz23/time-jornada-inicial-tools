@@ -1,6 +1,0 @@
-schema_version: "1.1"
-name: fixture-com-spec-e-desvio
-expected_outcome: |
-  Usa develop como base, lê request.md e plan.md da ABC-123, mostra o critério do motivo não atendido, o e-mail que nunca sai, a mudança fora do escopo em precos.py e o teste que só testa o mock.
-context:
-  scaffold_script: place-files.sh

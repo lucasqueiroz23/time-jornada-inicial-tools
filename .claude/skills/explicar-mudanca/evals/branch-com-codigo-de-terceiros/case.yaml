@@ -1,4 +1,0 @@
-schema_version: "1.1"
-name: branch-com-codigo-de-terceiros
-expected_outcome: |
-  Explica a troca do tlc-spec-driven pelo tlc-spec-lean, separando os arquivos copiados de terceiros das mudanças do time.
