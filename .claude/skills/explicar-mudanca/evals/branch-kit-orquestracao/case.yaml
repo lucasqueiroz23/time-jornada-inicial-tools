@@ -1,0 +1,4 @@
+schema_version: "1.1"
+name: branch-kit-orquestracao
+expected_outcome: |
+  Explica o kit de orquestração (agents, hooks, instalador, regra, docs) contra a main, com roteiro de leitura e pontos de atenção, sem veredito.
